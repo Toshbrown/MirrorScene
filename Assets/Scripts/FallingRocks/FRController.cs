@@ -13,14 +13,15 @@ public class FRController : Controller
         public int WAVE_LENGTH_SECONDS = 60;
         public Vector3 SHIP_START_POS = new Vector3(0.0f, 1.3f, 0.0f);
         public float inital_fall_delay = 2.5f;
+        public int increase_speed_after_x_seconds = 5;
+        public float increaseGravityBy = 0.02f;
+
         public int ship_hit_score = -100;
         public int rock_destroyed_score = 10;
-        public int increase_speed_after_x_seconds = 5;
 
         private float lastTime;
         
         public int numberOfLives = 3;
-        public float increaseGravityBy = 0.02f;
         public float fallingThingsGenYOffset = 0.3f;
         private int lives = 0;
         public int score = 0;
