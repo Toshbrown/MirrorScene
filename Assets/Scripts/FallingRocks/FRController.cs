@@ -10,23 +10,31 @@ public class FRController : Controller
         public GameObject kinnect;
         public GameObject shipPrototype;
 
-        private float lastTime;
+        public int WAVE_LENGTH_SECONDS = 60;
+        public Vector3 SHIP_START_POS = new Vector3(0.0f, 1.3f, 0.0f);
+        public float inital_fall_delay = 2.5f;
+        public int ship_hit_score = -100;
+        public int rock_destroyed_score = 10;
+        public int increase_speed_after_x_seconds = 5;
 
-        public float delay = 2.5f;
+        private float lastTime;
+        
         public int numberOfLives = 3;
-        public int increaseSpeedAfterXpoints = 5;
         public float increaseGravityBy = 0.02f;
         public float fallingThingsGenYOffset = 0.3f;
         private int lives = 0;
         public int score = 0;
         private float _delay = 2.5f;
-
+        private float game_start_time = 0;
+        
         private GameObject _currentShip;
 
         // Use this for initialization
         public override void Start()
         {
             lastTime = 0;
+            lives = 0;
+            game_start_time = Time.time;
             newUser();
         }
 
@@ -37,11 +45,12 @@ public class FRController : Controller
                 lastTime = 0;
                 score = 0;
                 lives = numberOfLives;
+                game_start_time = Time.time;
                 Physics.gravity = new Vector3(Physics.gravity.x, -1.0f, Physics.gravity.z);
-                _delay = delay;
+                _delay = inital_fall_delay;
                 if(_currentShip == null) {
                     _currentShip = Instantiate(shipPrototype);
-                    _currentShip.transform.position = new Vector3(0.0f, 1.3f, 0.0f);
+                    _currentShip.transform.position = SHIP_START_POS;
                 }
             }
         }
@@ -54,12 +63,19 @@ public class FRController : Controller
 
         public override void removeLife()
         {
-            lives -= 1;
+            //SHIP HIT
+            score = score + ship_hit_score;
+            /*lives -= 1;
             if (lives < 1) 
             {
                 print("Game Over");
                 gameOver();
-            }
+            }*/
+        }
+        
+        public void rockDestroyed() 
+        {
+            score = score + rock_destroyed_score;
         }
 
         public override void gameOver()
@@ -82,6 +98,14 @@ public class FRController : Controller
                 genCube();
                 lastTime = Time.time;
             }
+
+
+            if (Time.time > (game_start_time + WAVE_LENGTH_SECONDS) )
+            {
+                lives = 0;
+                gameOver();
+            }
+
         }
 
 
@@ -110,7 +134,7 @@ public class FRController : Controller
             {
                 score += 1;
 
-                var i = score / 10;
+                var i = (Time.time - game_start_time) / 10;
                 for (var j = 0; j <= i; j++)
                 {
                     GameObject newCube = Instantiate(fallingThingPrototype);
@@ -121,7 +145,7 @@ public class FRController : Controller
                 }
 
 
-                if (score % increaseSpeedAfterXpoints == 0 && _delay > 0.1)
+                if ((Time.time - game_start_time) % increase_speed_after_x_seconds == 0 && _delay > 0.1)
                 {
                     _delay -= 0.1f;
                     Physics.gravity = new Vector3(Physics.gravity.x, Physics.gravity.y - increaseGravityBy, Physics.gravity.z);
