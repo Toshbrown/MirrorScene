@@ -10,6 +10,8 @@ public class FRController : Controller
         public GameObject fallingThingPrototype;
         public GameObject kinnect;
         public GameObject shipPrototype;
+        public GameObject interactionGameObject;
+        private trackJoint interactionGameObjectScript;
 
         public int WAVE_LENGTH_SECONDS = 60;
         public Vector3 SHIP_START_POS = new Vector3(0.0f, 1.3f, 0.0f);
@@ -46,6 +48,9 @@ public class FRController : Controller
             game_start_time = Time.time;
             newUser();
             Physics.gravity = new Vector3(Physics.gravity.x, starting_gravity, Physics.gravity.z);
+
+            interactionGameObjectScript = interactionGameObject.GetComponent<trackJoint>();
+            interactionGameObjectScript.interactionStyle = "mirrorSpacePosition";
  
         }
 
@@ -113,6 +118,10 @@ public class FRController : Controller
                 lastTime = Time.time;
             }
 
+            if(timeRemaining < 50.0)
+            {
+                interactionGameObjectScript.interactionStyle = "orthogonalMirrorSpace";
+            }
 
             if (timeRemaining <= 0 )
             {
