@@ -15,6 +15,8 @@ public class FRController : Controller
         public Vector3 SHIP_START_POS = new Vector3(0.0f, 1.3f, 0.0f);
         public float inital_fall_delay = 2.5f;
         public int increase_speed_after_x_seconds = 5;
+        public int stop_increasespeed_dificulty_after_x_seconds = 25;
+        public float starting_gravity = 7.0f;
         public float increaseGravityBy = 0.02f;
         
         public int BAD_SCORE = -100;
@@ -43,6 +45,8 @@ public class FRController : Controller
             lives = 0;
             game_start_time = Time.time;
             newUser();
+            Physics.gravity = new Vector3(Physics.gravity.x, starting_gravity, Physics.gravity.z);
+ 
         }
 
         public override void newUser()
@@ -118,28 +122,12 @@ public class FRController : Controller
 
         }
 
-
+        
         public override void OnGUI()
         {
             GUIStyle LabelStyle = new GUIStyle(GUI.skin.GetStyle("label"));
             LabelStyle.fontSize = 32;
             LabelStyle.normal.textColor = Color.yellow;
-
-            GUI.Label(new Rect(15, 10, 200, 60), "Score: " + score, LabelStyle);
-            GUI.Label(new Rect(15, 40, 400, 60), "Time remaining: " + System.Math.Round(timeRemaining, 1), LabelStyle);
-
-            if(score < BAD_SCORE) {
-                BarBehaviour.Text = "Try Harder :-(";
-                BarBehaviour.Value = 66;
-            } else if (score > GOOD_SCORE) {
-                BarBehaviour.Text = "Doing well :-)";
-                BarBehaviour.Value = 0;
-            } else {
-                BarBehaviour.Text = "Could be better :-|";
-                BarBehaviour.Value = 33;
-            }
-
-            
 
             if (lives <= 0)
             {
@@ -148,6 +136,28 @@ public class FRController : Controller
                 GOLabelStyle.normal.textColor = Color.red;
                 GUI.Label(new Rect(400, 650, 300, 80), "Game Over", GOLabelStyle);
                 GUI.Label(new Rect(350, 750, 500, 80), "Step up to start a new game", LabelStyle);
+            }
+            else
+            {
+                
+                GUI.Label(new Rect(15, 10, 200, 60), "Score: " + score, LabelStyle);
+                GUI.Label(new Rect(15, 40, 400, 60), "Time remaining: " + System.Math.Round(timeRemaining, 1), LabelStyle);
+
+                if (score < BAD_SCORE)
+                {
+                    BarBehaviour.Text = "Try Harder :-(";
+                    BarBehaviour.Value = 66;
+                }
+                else if (score > GOOD_SCORE)
+                {
+                    BarBehaviour.Text = "Doing well :-)";
+                    BarBehaviour.Value = 0;
+                }
+                else
+                {
+                    BarBehaviour.Text = "Could be better :-|";
+                    BarBehaviour.Value = 33;
+                }
             }
 
             
@@ -159,7 +169,20 @@ public class FRController : Controller
             {
                 score += 1;
 
-                var i = (Time.time - game_start_time) / 10;
+                float game_length = (Time.time - game_start_time);
+
+                float i = 0;
+
+                if (stop_increasespeed_dificulty_after_x_seconds < game_length)
+                {
+                    i = game_length / 20;
+                }
+                else
+                {
+                    i = stop_increasespeed_dificulty_after_x_seconds / 20;
+                }
+
+                
                 for (var j = 0; j <= i; j++)
                 {
                     GameObject newCube = Instantiate(fallingThingPrototype);
@@ -169,8 +192,8 @@ public class FRController : Controller
                     Destroy(newCube, 10);    
                 }
 
-
-                if ((Time.time - game_start_time) % increase_speed_after_x_seconds == 0 && _delay > 0.1)
+                
+                if (game_length % increase_speed_after_x_seconds == 0 && stop_increasespeed_dificulty_after_x_seconds < game_length)
                 {
                     _delay -= 0.1f;
                     Physics.gravity = new Vector3(Physics.gravity.x, Physics.gravity.y - increaseGravityBy, Physics.gravity.z);

@@ -349,6 +349,32 @@ using System.Linq;
             return new Vector3(pos.x, pos.y, -1.0f * pos.z);
         }
 
+        public Vector3 orthogonalSpaceTransform(Body body, Windows.Kinect.JointType joint)
+        {
+
+            //Caculate MirrorSpace points
+            Vector3 realjointPos = kinectPossitionTransforms(body, joint);
+            Vector3 reflectionJointPos = reflectionTransform(body, joint);
+            
+            RaycastHit hit;
+
+            Vector3 dir = (reflectionJointPos - realjointPos).normalized;
+
+            //Debug.Log("HeadRayDIR:: " + dir.ToString());
+
+            Ray r = new Ray(realjointPos, dir);
+
+            if (Physics.Raycast(r, out hit, 4.0f, layerMask))
+            {
+                if (hit.collider.tag == "Mirror")
+                {
+                    return (Vector3)hit.point;
+                }
+            }
+
+            return Vector3.zero;
+        }
+
         public Vector3 mirrorSpaceTransform(Body body, Windows.Kinect.JointType joint)
         {
 
