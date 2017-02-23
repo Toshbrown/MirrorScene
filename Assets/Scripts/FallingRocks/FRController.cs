@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Exploder;
+using ProgressBar;
 
 public class FRController : Controller
     {
@@ -15,6 +16,9 @@ public class FRController : Controller
         public float inital_fall_delay = 2.5f;
         public int increase_speed_after_x_seconds = 5;
         public float increaseGravityBy = 0.02f;
+        
+        public int BAD_SCORE = -100;
+        public int GOOD_SCORE = 100;
 
         public int ship_hit_score = -100;
         public int rock_destroyed_score = 10;
@@ -29,10 +33,12 @@ public class FRController : Controller
         private float game_start_time = 0;
         
         private GameObject _currentShip;
+        public ProgressBarBehaviour BarBehaviour;
 
         // Use this for initialization
         public override void Start()
         {
+
             lastTime = 0;
             lives = 0;
             game_start_time = Time.time;
@@ -92,8 +98,11 @@ public class FRController : Controller
         }
 
         // Update is called once per frame
+        private float timeRemaining;
         public override void Update()
         {
+
+            timeRemaining = (game_start_time + WAVE_LENGTH_SECONDS) - Time.time;
             if (Time.time > lastTime + _delay)
             {
                 genCube();
@@ -101,7 +110,7 @@ public class FRController : Controller
             }
 
 
-            if (Time.time > (game_start_time + WAVE_LENGTH_SECONDS) )
+            if (timeRemaining <= 0 )
             {
                 lives = 0;
                 gameOver();
@@ -116,8 +125,21 @@ public class FRController : Controller
             LabelStyle.fontSize = 32;
             LabelStyle.normal.textColor = Color.yellow;
 
-            GUI.Label(new Rect(10, 10, 200, 60), "Score: " + score, LabelStyle);
-            GUI.Label(new Rect(10, 40, 200, 60), "Lives: " + lives, LabelStyle);
+            GUI.Label(new Rect(15, 10, 200, 60), "Score: " + score, LabelStyle);
+            GUI.Label(new Rect(15, 40, 400, 60), "Time remaining: " + System.Math.Round(timeRemaining, 1), LabelStyle);
+
+            if(score < BAD_SCORE) {
+                BarBehaviour.Text = "Try Harder :-(";
+                BarBehaviour.Value = 66;
+            } else if (score > GOOD_SCORE) {
+                BarBehaviour.Text = "Doing well :-)";
+                BarBehaviour.Value = 0;
+            } else {
+                BarBehaviour.Text = "Could be better :-|";
+                BarBehaviour.Value = 33;
+            }
+
+            
 
             if (lives <= 0)
             {
@@ -127,6 +149,8 @@ public class FRController : Controller
                 GUI.Label(new Rect(400, 650, 300, 80), "Game Over", GOLabelStyle);
                 GUI.Label(new Rect(350, 750, 500, 80), "Step up to start a new game", LabelStyle);
             }
+
+            
         }
 
         void genCube()
