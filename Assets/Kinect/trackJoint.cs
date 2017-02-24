@@ -12,6 +12,48 @@ public class trackJoint : MonoBehaviour
     public bool realPosition = false;
     public bool reflectedPosition = false;
     public bool mirrorSpacePosition = false;
+    public bool orthogonalMirrorSpace = false;
+
+
+    public string interactionStyle
+    {
+
+        set
+        {
+            realPosition = false;
+            reflectedPosition = false;
+            mirrorSpacePosition = false; //the default
+            orthogonalMirrorSpace = false;
+            MeshRenderer render = this.GetComponent<MeshRenderer>();
+
+            if (value == "realPosition")
+            {
+                realPosition = true;
+                render.enabled = true;
+            }
+            else if (value == "reflectedPosition")
+            {
+                reflectedPosition = true;
+                render.enabled = true;
+            }
+            else if (value == "mirrorSpacePosition")
+            {
+                mirrorSpacePosition = true;
+                render.enabled = false;
+            }
+            else if (value == "orthogonalMirrorSpace")
+            {
+                orthogonalMirrorSpace = true;
+                render.enabled = true;
+            }
+            else
+            {
+                mirrorSpacePosition = true;
+                render.enabled = false;
+            }
+
+        }
+    }
 
     public JointType joint = JointType.Head;
     public bool applyHeadRotation = false;
@@ -53,6 +95,11 @@ public class trackJoint : MonoBehaviour
             if (reflectedPosition)
             {
                 correctedPos = KBM.reflectionTransform(body, joint);
+            }
+
+            if (orthogonalMirrorSpace)
+            {
+                correctedPos = KBM.orthogonalSpaceTransform(body, joint);
             }
 
             if (mirrorSpacePosition)
