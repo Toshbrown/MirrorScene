@@ -33,15 +33,15 @@ public class dragableObject : MonoBehaviour {
     public Color hoverColor = Color.red;
 
     private bool freezeX = false;
-    private bool freezeY = true;
+    private bool freezeY = false;
     private bool freezeZ = true;
 
-    public float rangeXMin = -100f;
-    public float rangeXMax = 100f;
-    public float rangeYMin = -100f;
-    public float rangeYMax = 100f;
-    public float rangeZMin = -100f;
-    public float rangeZMax = 100f;
+    public float rangeXMin = -1000f;
+    public float rangeXMax = 1000f;
+    public float rangeYMin = -1000f;
+    public float rangeYMax = 1000f;
+    public float rangeZMin = -1000f;
+    public float rangeZMax = 1000f;
 
     public Range rangeX;
     public Range rangeY;
@@ -95,7 +95,7 @@ public class dragableObject : MonoBehaviour {
             return;
         }
 
-        Debug.Log("Enter");
+        Debug.Log("Enter " + otherObj.ToString());
 
         var jointScript = otherObj.GetComponent<trackJoint>();
         if (jointScript != null && jointScript.handClosed == false)
@@ -109,11 +109,6 @@ public class dragableObject : MonoBehaviour {
         else
         {
             handEnteredOpen = false;
-        }
-
-        if (otherObj.tag == "FallingThing")
-        {
-            controller.removeLife();
         }
     
     }
@@ -135,7 +130,7 @@ public class dragableObject : MonoBehaviour {
                 Vector3 newPos = otherObj.transform.position;
                 if (!freezeX)
                 {
-                    newPos.x = rangeX.clampToRange(otherObj.transform.position.x * 5.0f);
+                    newPos.x = rangeX.clampToRange(otherObj.transform.position.x);
                 } 
                 else
                 {
@@ -144,7 +139,7 @@ public class dragableObject : MonoBehaviour {
                 
                 if (!freezeY)
                 {
-                    newPos.y = rangeY.clampToRange(gameObject.transform.localPosition.y);
+                    newPos.y = rangeY.clampToRange(gameObject.transform.position.y);
                 }
                 else
                 {
@@ -153,7 +148,7 @@ public class dragableObject : MonoBehaviour {
 
                 if (!freezeZ)
                 {
-                    newPos.z = rangeZ.clampToRange(gameObject.transform.localPosition.z);
+                    newPos.z = rangeZ.clampToRange(gameObject.transform.position.z);
                 }
                 else
                 {
