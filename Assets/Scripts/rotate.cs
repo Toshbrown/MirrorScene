@@ -40,7 +40,7 @@ public class rotate : MonoBehaviour {
             dir = false;
         }
 
-        var yoffset = Mathf.Sin(Time.time) * 0.0007f; 
+        var yoffset = Mathf.Sin(Time.time) * 0.0003f; 
 
         if (dir)
         {

@@ -4,7 +4,7 @@ using Exploder;
 
 public class fallingThingColoider : MonoBehaviour {
 
-
+    private FRController controller;
     public ExploderObject exploder;
     public TextMesh numberTextMesh;
     private string _number;
@@ -13,6 +13,7 @@ public class fallingThingColoider : MonoBehaviour {
     {
         exploder = GameObject.Find("Exploder").GetComponent<ExploderObject>();
         numberTextMesh = this.GetComponentInChildren<TextMesh>();
+        controller = GameObject.Find("Controller").GetComponent<FRController>();
 
         if(_number != null)
         {
@@ -70,6 +71,11 @@ public class fallingThingColoider : MonoBehaviour {
 
     private bool canHit()
     {
+        if (numberTextMesh == null)
+        {
+            return false;
+        }
+
         if (numberTextMesh.text == "")
         {
             return true;
@@ -101,7 +107,13 @@ public class fallingThingColoider : MonoBehaviour {
                     {
                         Destroy(numberTextMesh);
                         exploder.ExplodeObject(gameObject.transform.Find("rock").gameObject);
+                        controller.rockDestroyed();
                     }
+                }
+                else if (jointScript != null && jointScript.handClosed == false)
+                {
+                    //if user onens and closes hand in sise obj the let it explode. 
+                    handEnteredOpen = true;
                 }
             }
         }
