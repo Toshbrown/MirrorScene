@@ -6,10 +6,27 @@ public class fallingThingColoider : MonoBehaviour {
 
 
     public ExploderObject exploder;
-
+    public TextMesh numberTextMesh;
+    private string _number;
+ 
     void Start() 
     {
         exploder = GameObject.Find("Exploder").GetComponent<ExploderObject>();
+        numberTextMesh = this.GetComponentInChildren<TextMesh>();
+
+        if(_number != null)
+        {
+            numberTextMesh.text = _number;
+        }
+    }
+
+    public void setNumber(int num)
+    {
+        _number = num.ToString();
+        if (numberTextMesh != null)
+        {
+            numberTextMesh.text = _number;
+        }
     }
 
     private bool handEnteredOpen;
@@ -41,9 +58,10 @@ public class fallingThingColoider : MonoBehaviour {
 
         if (otherObj.tag == "Ship")
         {
-            exploder.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y - 0.06f, gameObject.transform.position.z);
-            gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y - 0.06f, gameObject.transform.position.z);
-            exploder.ExplodeObject(gameObject, null);
+            //exploder.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y - 0.06f, gameObject.transform.position.z);
+            //gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y - 0.06f, gameObject.transform.position.z);
+            Destroy(numberTextMesh);
+            exploder.ExplodeObject(gameObject.transform.Find("rock").gameObject, null);
             //Destroy(gameObject, 5);
         }
 
@@ -56,16 +74,46 @@ public class fallingThingColoider : MonoBehaviour {
             return;
         }
 
-        Debug.Log("Hover");
-
-        var jointScript = otherObj.GetComponent<trackJoint>();
-        if (jointScript != null && handEnteredOpen)
+        if (numberTextMesh != null)
         {
-            if (jointScript.handClosed == true)
+            Debug.Log("Hover:: numberTextMesh " + numberTextMesh.text);
+
+            bool canHit = false;
+            if (numberTextMesh.text == "")
             {
-                exploder.ExplodeObject(gameObject, null);
+                canHit = true;
+            }
+            else if ( (IntParseFast(numberTextMesh.text) % 2) == 1 )
+            {
+                 canHit = true;
+            }
+
+            if (canHit)
+            {
+                var jointScript = otherObj.GetComponent<trackJoint>();
+                if (jointScript != null && handEnteredOpen)
+                {
+                    if (jointScript.handClosed == true)
+                    {
+                        Destroy(numberTextMesh);
+                        exploder.ExplodeObject(gameObject.transform.Find("rock").gameObject);
+                    }
+                }
             }
         }
     }
+
+    
+
+     public static int IntParseFast(string value)
+     {
+     int result = 0;
+     for (int i = 0; i < value.Length; i++)
+     {
+         char letter = value[i];
+         result = 10 * result + (letter - 48);
+     }
+     return result;
+     }
 
 }

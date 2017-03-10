@@ -44,11 +44,12 @@ public class FRController : Controller
         lastTime = 0;
         lives = 0;
         game_start_time = Time.time;
-        newUser();
         Physics.gravity = new Vector3(Physics.gravity.x, starting_gravity, Physics.gravity.z);
 
         interactionGameObjectScript = interactionGameObject.GetComponent<trackJoint>();
         interactionGameObjectScript.interactionStyle = "mirrorSpacePosition";
+
+        newUser();
 
     }
 
@@ -67,6 +68,8 @@ public class FRController : Controller
                 _currentShip = Instantiate(shipPrototype);
                 _currentShip.transform.position = SHIP_START_POS;
             }
+
+            interactionGameObjectScript.interactionStyle = "mirrorSpacePosition";
         }
     }
 
@@ -194,6 +197,11 @@ public class FRController : Controller
             for (var j = 0; j <= i; j++)
             {
                 GameObject newCube = Instantiate(fallingThingPrototype);
+                fallingThingColoider fallingThingScript = newCube.GetComponent<fallingThingColoider>();
+
+                fallingThingScript.setNumber(Random.Range(1, 101));
+
+
                 float offset = Random.Range(-0.1f, 0.1f);
                 float offsety = Random.Range(0.0f, fallingThingsGenYOffset);
                 newCube.transform.position = new Vector3(kinnect.transform.position.x + offset, kinnect.transform.position.y + offsety, kinnect.transform.position.z);
