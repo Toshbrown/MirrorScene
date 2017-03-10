@@ -49,7 +49,7 @@ public class FRController : Controller
 
     List<string> _currentState;
 
-    List<string> states = new List<string> { "waitingForUser", "wave1", "wave2", "rest" ,"wave3", "wave4", "gameover" };
+    List<string> states = new List<string> { "waitingForUser", "rest", "wave1", "rest", "wave2", "rest", "wave3", "rest", "wave4", "gameover" };
 
     string logFileName = @"c:\users\public\falingRocks.log";
     // Use this for initialization
@@ -110,7 +110,6 @@ public class FRController : Controller
             //swap interaction style after rest
             if (_currentState[0] == "rest")
             {
-                interactionGameObjectScript.interactionStyle = "orthogonalMirrorSpace";
                 Physics.gravity = new Vector3(Physics.gravity.x, -1.0f, Physics.gravity.z);
                 _delay = inital_fall_delay;
             }
@@ -127,17 +126,28 @@ public class FRController : Controller
             }
 
             //destroy all the things when entering rest state
-            if (_currentState[0] == "rest")
+            if (_currentState[0] == "rest" || _currentState[0] == "gameover")
             {
-                GameObject[] rocks = GameObject.FindGameObjectsWithTag("FallingThing");
-                foreach (GameObject rock in rocks)
-                {
-                    Destroy(rock,1);
-                }
+                destroyAllTheRocks();
+            }
+
+            //set the interaction mode for wave 3 and 4
+            if (_currentState[0] == "wave3" || _currentState[0] == "wave4")
+            {
+                interactionGameObjectScript.interactionStyle = "orthogonalMirrorSpace";
             }
 
             File.AppendAllText(logFileName, "######  " + _currentState[0] + " ######\n");
             Debug.Log("[CHANGED STATE] " + _currentState[0]);
+        }
+    }
+
+    public void destroyAllTheRocks()
+    {
+        GameObject[] rocks = GameObject.FindGameObjectsWithTag("FallingThing");
+        foreach (GameObject rock in rocks)
+        {
+            Destroy(rock, 1);
         }
     }
 
@@ -177,6 +187,7 @@ public class FRController : Controller
             _currentShip = null;
 
             setState("gameover");
+            destroyAllTheRocks();
         }
     }
 
@@ -248,14 +259,14 @@ public class FRController : Controller
 
         //the game is afoot
 
-        GUI.Label(new Rect(15, 10, 200, 60), "Score: " + score, LabelStyle);
+        //GUI.Label(new Rect(15, 10, 200, 60), "Score: " + score, LabelStyle);
         if (rocksSporned == 0)
         {
             GUI.Label(new Rect(15, 40, 400, 60), "Perfomance: 0 %", LabelStyle);
         }
         else 
         {
-            GUI.Label(new Rect(15, 40, 400, 60), "Perfomance: " + System.Math.Round((rocksDestroyed/rocksSporned)*100.0f, 1) + " %", LabelStyle);
+            GUI.Label(new Rect(15, 10, 400, 60), "Perfomance: " + System.Math.Round(((float)rocksDestroyed/(float)rocksSporned)*100.0f, 1) + " %", LabelStyle);
         }
     }
 
@@ -269,9 +280,9 @@ public class FRController : Controller
             {
                 //make it harder
                 i = (Time.time - lastStateChageTime) / 20;
-                if (i > 6)
+                if (i > 5)
                 {
-                    i = 6;
+                    i = 5;
                 }
                 if(_delay > 1.5f) {
                     _delay -= 0.1f;
