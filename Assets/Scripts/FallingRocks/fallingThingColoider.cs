@@ -58,15 +58,29 @@ public class fallingThingColoider : MonoBehaviour {
 
         if (otherObj.tag == "Ship")
         {
-            //exploder.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y - 0.06f, gameObject.transform.position.z);
-            //gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y - 0.06f, gameObject.transform.position.z);
-            Destroy(numberTextMesh);
-            exploder.ExplodeObject(gameObject.transform.Find("rock").gameObject, null);
+            if (canHit())
+            {
+                Destroy(numberTextMesh);
+                exploder.ExplodeObject(gameObject.transform.Find("rock").gameObject, null);
+            }
             //Destroy(gameObject, 5);
         }
 
     }
 
+    private bool canHit()
+    {
+        if (numberTextMesh.text == "")
+        {
+            return true;
+        }
+        else if ( (IntParseFast(numberTextMesh.text) % 2) == 1 )
+        {
+                return true;
+        }
+
+        return false;
+    }
     public void OnTriggerStay(Collider otherObj)
     {
         if (otherObj.CompareTag("Mirror"))
@@ -78,17 +92,7 @@ public class fallingThingColoider : MonoBehaviour {
         {
             Debug.Log("Hover:: numberTextMesh " + numberTextMesh.text);
 
-            bool canHit = false;
-            if (numberTextMesh.text == "")
-            {
-                canHit = true;
-            }
-            else if ( (IntParseFast(numberTextMesh.text) % 2) == 1 )
-            {
-                 canHit = true;
-            }
-
-            if (canHit)
+            if (canHit())
             {
                 var jointScript = otherObj.GetComponent<trackJoint>();
                 if (jointScript != null && handEnteredOpen)
